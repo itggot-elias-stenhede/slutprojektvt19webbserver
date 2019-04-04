@@ -1,5 +1,15 @@
+- pizzas.each do |pizza|
+    form action="/addtocart" method="POST"
+        p = pizza[0]
+        p = pizza[1]
+        input type="hidden" name="pizza-id" value = pizza[2]
+        input type="submit" value="Add"
+
 form action="/order" method="POST"
-    input type="text" name="Name" placeholder="Provisoriskt"
-    input type="text" name="Password" placeholder="Provisoriskt"
-    input type="text" name="Phone" placeholder="Provisoriskt" 
+    - sum = 0
+    - session[:cart].each do |item|
+        p = item[0]
+        - sum = sum + item[1]
+    p = "totalt: #{sum}"
+    input type="hidden" name="sum" value = sum
     input type="submit" value="Order"

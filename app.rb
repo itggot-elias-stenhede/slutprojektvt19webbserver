@@ -63,15 +63,23 @@ end
 
 get ("/order") do
     if permission()
-        slim(:order)
+        pizzas = pizzas()
+        session[:cart] = cart(session[:userdata][1])
+        slim(:order, locals: {pizzas: pizzas})
     else
         redirect ("/permission")
     end
 end
 
+post ("/addtocart") do
+    id = session[:userdata][1]
+    addtocart(params, id)
+    redirect ("/order")
+end
+
 post ("/order") do
     id = session[:userdata][1]
-    order(id)
+    order(params, id)
 end
 
 get ("/invoices") do
