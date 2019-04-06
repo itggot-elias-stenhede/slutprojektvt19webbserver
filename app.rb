@@ -14,7 +14,11 @@ helpers do
 end
 
 get ("/") do
-    slim(:home)
+    if permission()
+        slim(:profile)
+    else
+        slim(:home)
+    end
 end
 
 get ("/menu") do
@@ -61,30 +65,42 @@ get ("/profile") do
     end
 end
 
+def id()
+    return session[:userdata][1]
+end
+
 get ("/order") do
     if permission()
-        pizzas = pizzas()
-        session[:cart] = cart(session[:userdata][1])
-        slim(:order, locals: {pizzas: pizzas})
+        session[:cart] = cart(id())
+        slim(:order, locals: {pizzas: pizzas()})
     else
         redirect ("/permission")
     end
 end
 
 post ("/addtocart") do
-    id = session[:userdata][1]
-    addtocart(params, id)
-    redirect ("/order")
+    if permission()
+        id = id()
+        addtocart(params, id)
+        redirect ("/order")
+    else
+        redirect ("/permission")
+    end
 end
 
 post ("/order") do
-    id = session[:userdata][1]
-    order(params, id)
+    if permission()
+        id = id()
+        order(params, id)
+        redirect ("/profile")
+    else
+        redirect ("/permission")
+    end
 end
 
 get ("/invoices") do
     if permission()
-        slim(:invoices)
+        slim(:invoices, locals: {data: invoice(id())})
     else
         redirect ("/permission")
     end

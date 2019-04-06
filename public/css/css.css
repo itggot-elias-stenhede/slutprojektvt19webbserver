@@ -1,0 +1,9 @@
+body {
+    background-color: aqua;
+}
+
+.invoice {
+    display: block;
+    border-style: dashed;
+    margin: 3px;
+}

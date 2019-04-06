@@ -1,1 +1,6 @@
-p invoices
+- i = 0
+- data.first.length.times do 
+    div.invoice
+        - data.each do |element|
+            p = element[i]
+        - i += 1
