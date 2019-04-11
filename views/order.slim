@@ -1,9 +1,9 @@
 - pizzas.each do |pizza|
-    form action="/addtocart" method="POST"
-        p = pizza[0]
-        p = pizza[1]
-        input type="hidden" name="pizza-id" value = pizza[2]
-        input type="submit" value="Add"
+        form action="/addtocart" method="POST"
+            .line
+                p.add1 = "#{pizza[0]} - #{pizza[1]}"
+                input type="hidden" name="pizza-id" value = pizza[2]
+                input.add2 type="submit" value="Add"
 
 form action="/order" method="POST"
     - sum = 0
