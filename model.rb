@@ -8,13 +8,23 @@ end
 
 def register(params)
     db = database()
-    hashed_pass = BCrypt::Password.create("#{params["Password"]}")
-    db.execute("INSERT INTO users (Name, Password, Phone) VALUES (?, ?, ?)", params["Name"], hashed_pass, params["Phone"])
+    if params["Name"].length < 2
+        return {status: :error, message: "Name has to be longer than 3 characters!"}
+    elsif params["Password"].length < 5
+        return {status: :error, message: "Password needs to contain 6 or more characters!"}
+    end
+    
+    if db.execute("SELECT Phone FROM users WHERE Phone = #{params["Phone"]}") == []
+        hashed_pass = BCrypt::Password.create("#{params["Password"]}")
+        db.execute("INSERT INTO users (Name, Password, Phone) VALUES (?, ?, ?)", params["Name"], hashed_pass, params["Phone"])
+        return {status: :ok}
+    else
+        return {status: :error, message: "Phone number is already in use"}
+    end
 end
 
 def login(params)
     db = database()
-
     if params["Phone"].length > 0
         hashed_pass = db.execute("SELECT Password FROM users WHERE Phone = '#{params["Phone"]}'")
     else
@@ -72,57 +82,31 @@ end
 def occurs(indata)
     i = 0
     pizzas = Hash.new 0
+    prices = Hash.new 0
     pizza_output = []
+    prices_output = []
+    sums = []
+    timestamps = []
+    name = []
     while i < indata.length
         if indata[i+1] != nil && indata[i][5] == indata[i+1][5] 
             pizzas[indata[i][0]] += 1
+            prices[indata[i][2]] += 1
         else
             pizzas[indata[i][0]] += 1
             pizza_output << pizzas
             pizzas = Hash.new 0
-        end
-        i += 1
-    end
-
-    i = 0
-    prices = Hash.new 0
-    prices_output = []
-    while i < indata.length
-        if indata[i+1] != nil && indata[i][5] == indata[i+1][5] 
-            prices[indata[i][2]] += 1
-        else
             prices[indata[i][2]] += 1
             prices_output << prices
             prices = Hash.new 0
-        end
-        i += 1
-    end
-
-    i = 0
-    sums = []
-    while i < indata.length
-        if indata[i+1] != nil && indata[i][5] != indata[i+1][5]
+            name << indata.first[1]
             sums << indata[i][3]
-        end
-        i += 1
-    end
-    sums << indata[i-1][3]
-
-    i = 0
-    timestamps = []
-    while i < indata.length
-        if indata[i+1] != nil && indata[i][5] != indata[i+1][5]
             timestamps << indata[i][4]
         end
         i += 1
     end
+    sums << indata[i-1][3]
     timestamps << indata[i-1][4]
-
-    name = []
-    timestamps.length.times do
-        name << indata.first[1]
-    end
-
     return pizza_output, prices_output, sums, timestamps, name
 end
 

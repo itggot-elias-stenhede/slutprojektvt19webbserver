@@ -10,4 +10,7 @@ html lang="en"
         header
             h1
                 a href="/#" Krokens Pizzeria
+            - if permission()
+                p.logout
+                    a href="/logout" Logga ut
         == yield

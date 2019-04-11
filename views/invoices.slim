@@ -1,6 +1,15 @@
 - i = 0
-- data.first.length.times do 
-    div.invoice
-        - data.each do |element|
-            p = element[i]
+- data.first.length.times do
+    .invoice
+        .name
+            - x = data[0][i] 
+            - x.each do |name, amount|
+                p = "#{amount} x #{name}"
+        .price
+            - x = data[1][i] 
+            - x.each do |price, amount|
+                p.price = "á #{price}kr = #{price*amount}"
+        p.sum = "Summa:      #{data[2][i]}"
+        p.timestamp = "Tid:        #{data[3][i]}"
+        p.username = "Beställare: #{data[4][i]}"
         - i += 1

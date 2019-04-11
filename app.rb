@@ -22,7 +22,8 @@ get ("/") do
 end
 
 get ("/menu") do
-    slim(:menu)
+    pizzas()
+    slim(:menu, locals: {pizzas: pizzas()})
 end
 
 get ("/info") do
@@ -34,8 +35,12 @@ get ("/register") do
 end
 
 post ("/register") do
-    register(params)
-    redirect("/profile")
+    status = register(params)
+    if status[:status] == :error
+        status[:message]
+    else
+        redirect("/login")
+    end
 end
 
 get ("/login") do
@@ -104,4 +109,9 @@ get ("/invoices") do
     else
         redirect ("/permission")
     end
+end
+
+get ("/logout") do
+    session.destroy
+    redirect("/")
 end
