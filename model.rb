@@ -105,8 +105,10 @@ def occurs(indata)
         end
         i += 1
     end
-    sums << indata[i-1][3]
-    timestamps << indata[i-1][4]
+    if indata[i-1] != nil
+        sums << indata[i-1][3]
+        timestamps << indata[i-1][4]
+    end
     return pizza_output, prices_output, sums, timestamps, name
 end
 
