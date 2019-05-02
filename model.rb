@@ -26,7 +26,7 @@ end
 def login(params)
     db = database()
     if params["Phone"].length > 0
-        hashed_pass = db.execute("SELECT Password FROM users WHERE Phone = '#{params["Phone"]}'")
+        hashed_pass = db.execute("SELECT Password FROM users WHERE Phone = ?", params["Phone"])
     else
         return {status: :error, message: "Invalid Credentials"}
     end
@@ -38,7 +38,7 @@ def login(params)
     end
 
     if BCrypt::Password.new(hashed_pass) == params["Password"]
-        userdata = db.execute("SELECT Name, Id FROM users WHERE Phone = '#{params["Phone"]}'")
+        userdata = db.execute("SELECT Name, Id FROM users WHERE Phone = ?", params["Phone"])
         return {status: :ok, userdata: userdata.first}
     else
         return {status: :error, message: "Invalid Credentials"}
@@ -52,7 +52,7 @@ end
 
 def cart(id)
     db = database()
-    return db.execute("SELECT PizzaName, Price, PizzaId FROM pizzas INNER JOIN carts ON UserId = #{id} WHERE PizzaId = Id")
+    return db.execute("SELECT PizzaName, Price, PizzaId FROM pizzas INNER JOIN carts ON UserId = ? WHERE PizzaId = Id", id)
 end
 
 def addtocart(params, id)
@@ -66,7 +66,7 @@ def order(params, id)
     i = 0
     time = Time.now.to_s[0..18]
     db.execute("INSERT INTO invoices (Sum, UserId, Timestamp) VALUES (?, ?, ?)", params["sum"].to_i, id, time)
-    invoiceid = db.execute("SELECT Id FROM invoices WHERE Timestamp = '#{time}'")
+    invoiceid = db.execute("SELECT Id FROM invoices WHERE Timestamp = ?", time)
     cart.each do |item|
         print item
         db.execute("INSERT INTO pizza_invoice_relation (InvoiceId, PizzaId) VALUES (?, ?)", invoiceid, item[2])
@@ -76,7 +76,7 @@ end
 
 def delete_cart(id)
     db = database()
-    db.execute("DELETE FROM carts WHERE UserId = #{id}")
+    db.execute("DELETE FROM carts WHERE UserId = ?", id)
 end
 
 def occurs(indata)
@@ -118,11 +118,11 @@ def invoice(id)
     FROM invoices 
     INNER JOIN pizza_invoice_relation 
     INNER JOIN pizzas 
-    INNER JOIN users ON invoices.UserId = #{id}
+    INNER JOIN users ON invoices.UserId = ?
     WHERE pizza_invoice_relation.PizzaId = pizzas.Id 
     AND users.Id = invoices.UserId 
 	AND pizza_invoice_relation.InvoiceId = invoices.Id
     ORDER BY Timestamp
-    "))
+    ", id))
     return occurs(data)
 end

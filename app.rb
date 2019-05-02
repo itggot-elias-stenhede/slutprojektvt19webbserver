@@ -11,6 +11,10 @@ helpers do
             return false
         end
     end    
+
+    def id()
+        return session[:userdata][1]
+    end
 end
 
 get ("/") do
@@ -70,9 +74,7 @@ get ("/profile") do
     end
 end
 
-def id()
-    return session[:userdata][1]
-end
+
 
 get ("/order") do
     if permission()
