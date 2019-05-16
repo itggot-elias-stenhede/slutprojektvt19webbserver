@@ -1,4 +1,6 @@
 form action="/register" method="POST"
+    - if session[:message]
+        p = get_error()
     input type="text" name="Name" placeholder="Enter username"
     input type="text" name="Password" placeholder="Enter password"
     input type="text" name="Phone" placeholder="Enter phone number" 

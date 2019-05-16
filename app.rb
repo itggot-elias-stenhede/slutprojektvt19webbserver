@@ -21,6 +21,13 @@ helpers do
     end
 end
 
+unsecured_paths = ["/", "/menu", "/info", "/register", "/login", "/permission", "/logout"]
+
+before do
+    if not unsecured_paths.include?(request.path) || permission()
+        redirect("/permission")
+    end
+end
 
 # Displays homepage differently depending if user is logged in or not
 #
@@ -66,22 +73,14 @@ end
 # Displays a profile page
 #
 get ("/profile") do
-    if permission()
-        slim(:profile)
-    else
-        redirect ("/permission")
-    end
+    slim(:profile)
 end
 
 # Displays a the order page with the avalible pizzas
 #
 get ("/order") do
-    if permission()
-        session[:cart] = cart(id())
-        slim(:order, locals: {pizzas: pizzas()})
-    else
-        redirect ("/permission")
-    end
+    session[:cart] = cart(id())
+    slim(:order, locals: {pizzas: pizzas()})
 end
 
 # Attempts to register a new user and if possible redirects to /login, else displays error message
@@ -94,7 +93,8 @@ end
 post ("/register") do
     status = register(params)
     if status[:status] == :error
-        status[:message]
+        session[:message] = status[:message]
+        redirect back
     else
         redirect("/login")
     end
@@ -109,10 +109,11 @@ end
 post ("/login") do
     status = login(params)
     if status[:status] == :error
-        status[:message]
+        session[:message] = status[:message]
+        redirect back
     else
         session[:loggedin] = true
-        session[:userdata] = status[:userdata]      #hur skickar jag med användarnamn?
+        session[:userdata] = status[:userdata]
         redirect("/profile")
     end
 end
@@ -123,13 +124,9 @@ end
 #
 # @see Model#addtocart
 post ("/addtocart") do
-    if permission()
-        id = id()
-        addtocart(params, id)
-        redirect ("/order")
-    else
-        redirect ("/permission")
-    end
+    id = id()
+    addtocart(params, id)
+    redirect ("/order")
 end
 
 # Creates an order
@@ -137,13 +134,9 @@ end
 # @param [String] sum, adds sum to invoice
 # @see model#order
 post ("/order") do
-    if permission()
-        id = id()
-        order(params, id)
-        redirect ("/profile")
-    else
-        redirect ("/permission")
-    end
+    id = id()
+    order(params, id)
+    redirect ("/profile")
 end
 
 # Shows page with logged in user's invoice
@@ -151,11 +144,7 @@ end
 # @param [String] 
 # @see model#invoice
 get ("/invoices") do
-    if permission()
-        slim(:invoices, locals: {data: invoice(id())})
-    else
-        redirect ("/permission")
-    end
+    slim(:invoices, locals: {data: invoice(id())})
 end
 
 # Destroys session and redirects to homepage

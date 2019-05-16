@@ -118,6 +118,15 @@ module MyModule
         db.execute("DELETE FROM carts WHERE UserId = ?", id)
     end
 
+    # Fetches and returns a error message
+    #
+    # @return [String] error message
+    def get_error()
+        error = session[:message]
+        session.destroy  
+        return error
+    end
+
     # Rearranges raw data from database to a more structured format
     #
     # @param [String] PizzaName
@@ -126,17 +135,17 @@ module MyModule
     # @param [String] Sum
     # @param [String] Timestamp
     # @param [String] InvoiceId
+    # @return [Array]
+        # @return [Hash]
+            # pizza_output
+        # @return [Hash]
+            # prices_output
         # @return [Array]
-            # @return [Hash]
-                # pizza_output
-            # @return [Hash]
-                # prices_output
-            # @return [Array]
-                # sums
-            # @return [Array]
-                # timestamps
-            # @return [Array]
-                # name
+            # sums
+        # @return [Array]
+            # timestamps
+        # @return [Array]
+            # name
     def occurs(indata)
         i = 0
         pizzas = Hash.new 0

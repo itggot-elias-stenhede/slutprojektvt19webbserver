@@ -1,4 +1,6 @@
 form action="/login" method="POST"
+    - if session[:message]
+        p = get_error()
     input type="text" name="Phone" placeholder="Telefonnummer"
     input type="text" name="Password" placeholder="Lösenord"
     input type="submit" value="Logga in!"
